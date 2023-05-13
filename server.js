@@ -22,7 +22,7 @@ app.get("/search",(req,res)=>{
     axios.get("https://developer.nps.gov/api/v1/parks?limit=20",{
         params:queryParams
     }).then(function(result){
-        //console.log(result.data);
+        console.log(result.data);
         res.send(result.data.data);
     }).catch(function(err){
         console.log(err.data);
@@ -36,7 +36,7 @@ app.get("/detail",(req,res)=>{
     axios.get("https://developer.nps.gov/api/v1/thingstodo?limit=3",{
         params:queryParams
     }).then(function(result){
-        console.log(result.data);
+        //console.log(result.data);
         var thingsToDo=processResults(result.data.data);
         res.send(thingsToDo);
     }).catch((err)=>{

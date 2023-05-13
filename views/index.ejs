@@ -68,7 +68,7 @@
       </div>
       <button class="btn btn-outline-light" type="button" id="btn">search</button>
     </form>
-    <div class="container" id="display-container">
+    <div class="container" id="display-container" style="display:none">
       <div class="row">
         <div class="col"></div>
         <div class="col"></div>
@@ -95,10 +95,11 @@
       </div>
     </div>
     
-    <div id="detail" class="container">
+    <div id="detail" class="container" style="display:none">
+    <div id="map"></div>
     </div>
-
     <script src="/script.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCl7geUu8GS4JyyDQQ4di9lB1K8YSgzZnw&callback=initMap"></script>
   </body>
 </html>
