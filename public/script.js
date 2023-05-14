@@ -18,7 +18,7 @@ function initMap() {
     marker = new google.maps.Marker({
         position:{ lat:39.003, lng: -122.4194 }, // set the marker position
         map: map, // set the marker to appear on the map
-        title: "San Francisco", // set the tooltip title of the marker
+        title: "target", // set the tooltip title of the marker
     });
 }
 
@@ -29,52 +29,53 @@ async function fetchData(url) { //fetch api from provided url
         return data;
     }
 }
+const itemsPerPage=9;
+var currentPage=1;
+function displayItems(startIndex){
+    endIndex = startIndex+itemsPerPage;
+    const items = results.slice(startIndex,endIndex);
+    console.log(items.length);
+    return items;
+}
+
+
 function createTable(object){
     table = document.createElement("table");
-    table.innerHTML="";/*
-    thead = table.createTHead();
-    row = thead.insertRow();
-    let header = ["Day","Hours"];
-    for(let i=0;i<header.length;i++){
-        th = document.createElement("th");
-        text = document.createTextNode(header[i]);
-        th.appendChild(text);
-        row.appendChild(th);
-    }*/
+    table.innerHTML="";
     let mybody = table.createTBody();
-    for(let day in object){ //iterate through each business
+    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    for(let i = 0; i<7; i++){ //iterate through each business
         let row = mybody.insertRow();
         const col1 = row.insertCell(); //first column: index
-        col1.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+        col1.textContent = daysOfWeek[i].charAt(0).toUpperCase() + daysOfWeek[i].slice(1);
         col1.style["font-weight"]="bold";
         const col2= row.insertCell();
-        col2.textContent = object[day];
+        col2.textContent = object[daysOfWeek[i]];
     }
     return table;
 }
 
+function validation(){
+    if(!keyword.checkValidity()&&state.value==""){
+        keyword.reportValidity();
+        return false;
+    }else{
+        keyword.addEventListener('change', (event) => {
+            event.target.value = DOMPurify.sanitize(event.target.value);
+        });
+        return true;
+    } ;
+}
+
 window.onload = function(){ 
-    function validation(){
-        if(!keyword.checkValidity()&&!state.checkValidity){
-            keyword.reportValidity();
-            return false;
-        }else{
-            keyword.addEventListener('change', (event) => {
-                event.target.value = DOMPurify.sanitize(event.target.value);
-            });
-            return true;
-        } ;
-    }
-    
     window.initMap = initMap;
-    
     submit.onclick=()=>{
         if(validation()==true){
             backend.searchParams.set('q',keyword.value);
             backend.searchParams.set('stateCode',state.value);
             fetchData(backend).then(data=>{
                 results=data;
-                data.onload=displayItems(0);
+                data.onload=generateGrid(displayItems(0));
                 updatePagination();
             })
         }
@@ -82,8 +83,7 @@ window.onload = function(){
 
     function generateGrid(results){
         container.style.display="block";
-        //results=jsonObj.data;
-        //console.log(results);
+        detail.style.display="none";
         parentElements.forEach((element)=>{
             element.innerHTML="";
         })
@@ -115,29 +115,32 @@ window.onload = function(){
     function displayDetail(detailObj){
         detail.scrollIntoView();
         //detail.innerHTML="";
-        const carousel = document.createElement("div");
-        carousel.setAttribute("id", "carouselExampleSlidesOnly");
-        carousel.classList.add("carousel", "slide");
-        carousel.setAttribute("data-bs-ride", "carousel");
-        const inner = document.createElement("div");
-        inner.classList.add("carousel-inner");
-        carousel.appendChild(inner);
-        detail.appendChild(carousel);
-        const back = document.createElement("button");
-        back.classList.add("btn","btn-outline-dark");
-        back.textContent="Back";
-        back.onclick=()=>{
-            detail.style.display="none";
-            container.style.display="block";
+        const carousel = document.getElementById("carouselExampleSlidesOnly");
+        //carousel.setAttribute("id", "carouselExampleSlidesOnly");
+        //carousel.classList.add("carousel", "slide");
+        //carousel.setAttribute("data-bs-ride", "carousel");
+        const inner = document.querySelector(".carousel-inner");
+        //inner.classList.add("carousel-inner");
+        //carousel.appendChild(inner);
+        //detail.appendChild(carousel);
+ 
+        if(document.getElementById("park")==null){
+            const back = document.createElement("button");
+            back.classList.add("btn","btn-outline-dark");
+            back.textContent="Back";
+            back.onclick=()=>{
+                detail.style.display="none";
+                container.style.display="block";
+            }
+            detail.insertBefore(back,carousel);
+            const head = document.createElement("h2");
+            head.id=('park');
+            head.innerHTML=detailObj["fullName"];
+            detail.insertBefore(head,carousel);
+            detail.insertBefore(document.createElement('hr'),carousel);
         }
-        detail.insertBefore(back,carousel);
-        const head = document.createElement("h2");
-        head.id=('park');
-        //if(detailObj==undefined||detailObj==null){
-        head.innerHTML=detailObj["fullName"];
-        detail.insertBefore(head,carousel);
-        detail.insertBefore(document.createElement('hr'),carousel);
-        //const inner = document.querySelector(".carousel-inner");//create carousel item
+
+        inner.innerHTML="";
         detailObj.images.forEach((image, index) => {
             const slide = document.createElement('div');
             slide.classList.add('carousel-item');
@@ -147,7 +150,7 @@ window.onload = function(){
             const slideImage = document.createElement('img');
             slideImage.classList.add('d-block', 'w-100');
             slideImage.src = image.url;
-            slideImage.alt = "Ahh, the picture is lost.";
+            slideImage.alt = "This is a picture of the park.";
             slide.appendChild(slideImage);
             inner.appendChild(slide);
         });
@@ -205,20 +208,10 @@ window.onload = function(){
             }
         })
     }
-    
-    const itemsPerPage=9;
-    var currentPage=1;
-    function displayItems(startIndex){
-        endIndex = startIndex+itemsPerPage;
-        const items = results.slice(startIndex,endIndex);
-        console.log(items.length);
-        generateGrid(items);
-        //call generateGrid() here.
-    }
     function updatePagination() {
         numPages = Math.ceil(results.length / itemsPerPage);
-        var pagelink = document.querySelectorAll(".page-link");
-        if(pagelink.length==2){
+        var pageLink = document.querySelectorAll(".page-link");
+        if(pageLink.length==2){
             for (let i = 1; i <= numPages; i++) {
             //const li = document.createElement('li');
             pageLink = document.createElement('a');
@@ -226,19 +219,21 @@ window.onload = function(){
             pageLink.href = '#';
             pageLink.innerText = i;
             pageLink.addEventListener('click', () => {
-                displayItems((i-1)*9);
+                newItem = displayItems((i-1)*9);
+                generateGrid(newItem);
                 currentPage=i;
             });
             document.querySelector(".pagination").insertBefore(pageLink,nextPage);
             }
         }
-    
     }
+
     prevPage.addEventListener('click', () => {
         if (currentPage > 1) {
           currentPage -= 1;
           const startIndex = (currentPage - 1) * itemsPerPage;
-          displayItems(startIndex);
+          prevItem=displayItems(startIndex);
+          generateGrid(prevItem);
         }
       });
     nextPage.addEventListener('click', () => {
@@ -246,13 +241,11 @@ window.onload = function(){
           currentPage += 1;
           const startIndex = (currentPage - 1) * itemsPerPage;
           displayItems(startIndex);
-          
+          nextItem=displayItems(startIndex);
+          generateGrid(nextItem);
         }
       });
 
 };
-    
-function sum(a, b) {
-    return a + b;
-  }
-  module.exports = sum;
+
+  module.exports = displayItems;
