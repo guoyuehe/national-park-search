@@ -79,9 +79,9 @@ nav{
     max-width: 800px;
     background-color: rgba(255, 255, 255, 0.7);
     border-radius: 0.5rem;
-    padding: 1.5rem 1rem 2rem;
+    padding: 1rem 1rem 2rem;
     margin-top: 3rem;
-    margin-bottom:2rem;
+    margin-bottom:1rem;
 
 }
 #temp{
@@ -99,11 +99,13 @@ nav{
 #map{
     height:400px;
 }
-@keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  
+#detail .btn{
+    float:left;
+    padding: 5px 6px;
+}
+#detail h2{
+    padding: 1.5rem 0 0.5rem;
+}
 @media screen and (max-width: 428px){
     h1{
         font-size: 2.2rem;

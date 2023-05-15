@@ -176,7 +176,6 @@ window.onload = function(){
         weatherUrl.searchParams.set("latitude",detailObj.latitude);
         weatherUrl.searchParams.set("longitude",detailObj.longitude);
         fetchData(weatherUrl).then(data=>{
-            console.log(data);
             row.firstChild.innerHTML = "<p id='temp'>"+data.temp_f+"°F</p>" +"<img src='" +data.condition.icon+ "' width=70px height = 70px>";
         })
         const directions = document.createElement("p");

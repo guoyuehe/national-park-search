@@ -1,5 +1,5 @@
 # national-park-search
-This is a project that utilizes National Park Service API to provide informations about national parks in the United States. You can search for parks using keywords, park name or by selecting a state. Click on results to see detail information about the operating hours, directions, weather, location, etc. 
+This is a project that utilizes National Park Service API to provide informations about national parks in the United States. You can search for parks using keywords, park name or by selecting a state. Click on results to see detail information about park operating hours, directions, weather, location, etc. 
 It is built using Node.js, Express, and EJS.
 
 ## Installation
@@ -7,6 +7,8 @@ To install this project, you'll need to have Node.js installed on your machine. 
 1. Clone this repository to your local machine.
 2. Navigate to the project directory.
 3. Run the command npm install to install the project dependencies.
+4. Download Bootstrap5 and create a directory named "bootstrap" in the root of the project
+5. Move the extracted "css" and "js" folders into the "bootstrap" directory.
 
 ## Usage
 To run the project, follow these steps:

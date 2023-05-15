@@ -10,8 +10,7 @@ const app = express();
 app.use(cors());
 app.set("view engine", "ejs");
 app.use(express.static('public'));// Serve static files from the 'public and vendor' directory
-app.use('/vendor', express.static('vendor'));
-var BaseURL = new URL("https://developer.nps.gov/api/v1");
+app.use('/bootstrap', express.static('bootstrap'));
 const key ="Hq22lDogB9fT2RnHK5smvVPnlaRF6ELQrnctwlhc";
 
 app.get("/",(req,res) =>{
@@ -30,7 +29,7 @@ app.get("/search",(req,res)=>{
     }
     queryParams.api_key=key;
     //console.log(queryParams);
-    axios.get("https://developer.nps.gov/api/v1/parks?limit=20",{
+    axios.get("https://developer.nps.gov/api/v1/parks?limit=50",{
         params:queryParams
     }).then(function(result){
         //console.log(result.data);
