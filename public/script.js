@@ -110,6 +110,9 @@ window.onload = function(){
 
     function displayDetail(detailObj){
         detail.scrollIntoView();
+        const carousel = document.getElementById("carouselExampleSlidesOnly");
+        const inner = document.querySelector(".carousel-inner");
+
         if(document.getElementById("park")==null){
             const back = document.createElement("button");
             back.classList.add("btn","btn-outline-dark");
@@ -127,8 +130,7 @@ window.onload = function(){
         }else{
             document.getElementById('park').innerHTML=detailObj["fullName"];
         }
-        const carousel = document.getElementById("carouselExampleSlidesOnly");
-        const inner = document.querySelector(".carousel-inner");
+
         inner.innerHTML="";
         detailObj.images.forEach((image, index) => {
             const slide = document.createElement('div');
@@ -182,11 +184,11 @@ window.onload = function(){
         infoSection.insertBefore(directions,subheading[2]);//insert google map;
         infoSection.appendChild(document.getElementById('map'));
         infoSection.insertBefore(document.getElementById('map'),subheading[5]);
+        
         const latitude=parseFloat(detailObj.latitude) ;
         const longitude=parseFloat(detailObj.longitude);
         map.setCenter({lat:latitude,lng:longitude});
         marker.setPosition({lat:latitude,lng:longitude});
-        
         const url = document.createElement("a");
         url.href = detailObj.url;
         url.target='_blank';
