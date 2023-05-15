@@ -16,9 +16,9 @@ function initMap() {
     zoom: 8,
     });
     marker = new google.maps.Marker({
-        position:{ lat:39.003, lng: -122.4194 }, // set the marker position
+        position:{ lat:39.003, lng: -122.4194 }, // set initial marker position
         map: map, // set the marker to appear on the map
-        title: "target", // set the tooltip title of the marker
+        title: "target", 
     });
 }
 
@@ -34,19 +34,17 @@ var currentPage=1;
 function displayItems(startIndex){
     endIndex = startIndex+itemsPerPage;
     const items = results.slice(startIndex,endIndex);
-    console.log(items.length);
     return items;
 }
-
 
 function createTable(object){
     table = document.createElement("table");
     table.innerHTML="";
     let mybody = table.createTBody();
     const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-    for(let i = 0; i<7; i++){ //iterate through each business
+    for(let i = 0; i<7; i++){ 
         let row = mybody.insertRow();
-        const col1 = row.insertCell(); //first column: index
+        const col1 = row.insertCell(); 
         col1.textContent = daysOfWeek[i].charAt(0).toUpperCase() + daysOfWeek[i].slice(1);
         col1.style["font-weight"]="bold";
         const col2= row.insertCell();
@@ -60,9 +58,6 @@ function validation(){
         keyword.reportValidity();
         return false;
     }else{
-        keyword.addEventListener('change', (event) => {
-            event.target.value = DOMPurify.sanitize(event.target.value);
-        });
         return true;
     } ;
 }
@@ -112,18 +107,9 @@ window.onload = function(){
         });
         document.getElementById("display-container").scrollIntoView();
     }
+
     function displayDetail(detailObj){
         detail.scrollIntoView();
-        //detail.innerHTML="";
-        const carousel = document.getElementById("carouselExampleSlidesOnly");
-        //carousel.setAttribute("id", "carouselExampleSlidesOnly");
-        //carousel.classList.add("carousel", "slide");
-        //carousel.setAttribute("data-bs-ride", "carousel");
-        const inner = document.querySelector(".carousel-inner");
-        //inner.classList.add("carousel-inner");
-        //carousel.appendChild(inner);
-        //detail.appendChild(carousel);
- 
         if(document.getElementById("park")==null){
             const back = document.createElement("button");
             back.classList.add("btn","btn-outline-dark");
@@ -138,8 +124,11 @@ window.onload = function(){
             head.innerHTML=detailObj["fullName"];
             detail.insertBefore(head,carousel);
             detail.insertBefore(document.createElement('hr'),carousel);
+        }else{
+            document.getElementById('park').innerHTML=detailObj["fullName"];
         }
-
+        const carousel = document.getElementById("carouselExampleSlidesOnly");
+        const inner = document.querySelector(".carousel-inner");
         inner.innerHTML="";
         detailObj.images.forEach((image, index) => {
             const slide = document.createElement('div');
@@ -154,9 +143,15 @@ window.onload = function(){
             slide.appendChild(slideImage);
             inner.appendChild(slide);
         });
+        if(document.getElementById("info")!=null){
+            detail.appendChild(document.getElementById("map"));
+            document.getElementById("info").innerHTML="";
+            detail.removeChild(document.getElementById('info'));
+        }
         const infoSection = document.createElement("div");
+        infoSection.id="info";
         detail.appendChild(infoSection);
-      
+
         subheading = [];
         subheads=["Operating Hours","Directions","Weather","Things To Do", "Map","More info"];
         for(let i = 0;i<subheads.length;i++){
@@ -167,9 +162,11 @@ window.onload = function(){
         mytable = createTable(detailObj.operatingHours[0].standardHours);
         infoSection.appendChild(mytable);
         infoSection.insertBefore(mytable,subheading[1]);
+
         const row= document.createElement("div");
         row.innerHTML="<div></div> <div></div>";
         infoSection.insertBefore(row,subheading[3]);
+
         const weatherInfo = document.createElement("p");
         weatherInfo.textContent=detailObj.weatherInfo;
         row.lastChild.appendChild(weatherInfo);
@@ -185,17 +182,17 @@ window.onload = function(){
         infoSection.insertBefore(directions,subheading[2]);//insert google map;
         infoSection.appendChild(document.getElementById('map'));
         infoSection.insertBefore(document.getElementById('map'),subheading[5]);
-        
         const latitude=parseFloat(detailObj.latitude) ;
         const longitude=parseFloat(detailObj.longitude);
         map.setCenter({lat:latitude,lng:longitude});
         marker.setPosition({lat:latitude,lng:longitude});
+        
         const url = document.createElement("a");
         url.href = detailObj.url;
         url.target='_blank';
         url.innerHTML = 'Visit Official Website';
         subheading[5].after(url);
-    
+
         var detailurl="http://localhost:5000/detail?parkCode="+detailObj.parkCode;
         fetchData(detailurl).then(data=>{
             if(data==null||data==undefined||data.length===0){
@@ -211,20 +208,23 @@ window.onload = function(){
     function updatePagination() {
         numPages = Math.ceil(results.length / itemsPerPage);
         var pageLink = document.querySelectorAll(".page-link");
-        if(pageLink.length==2){
-            for (let i = 1; i <= numPages; i++) {
-            //const li = document.createElement('li');
-            pageLink = document.createElement('a');
-            pageLink.classList.add("page-link");
-            pageLink.href = '#';
-            pageLink.innerText = i;
-            pageLink.addEventListener('click', () => {
-                newItem = displayItems((i-1)*9);
-                generateGrid(newItem);
-                currentPage=i;
-            });
-            document.querySelector(".pagination").insertBefore(pageLink,nextPage);
-            }
+        let elemToRemove = prevPage.nextSibling;
+        while (elemToRemove && elemToRemove !== nextPage) {
+            const nextSibling = elemToRemove.nextSibling;
+            document.querySelector('.pagination').removeChild(elemToRemove);
+            elemToRemove=nextSibling;
+        }
+        for (let i = 1; i <= numPages; i++) {
+        pageLink = document.createElement('a');
+        pageLink.classList.add("page-link");
+        pageLink.href = '#';
+        pageLink.innerText = i;
+        pageLink.addEventListener('click', () => {
+            newItem = displayItems((i-1)*9);
+            generateGrid(newItem);
+            currentPage=i;
+        });
+        document.querySelector(".pagination").insertBefore(pageLink,nextPage);
         }
     }
 
@@ -248,4 +248,4 @@ window.onload = function(){
 
 };
 
-  module.exports = displayItems;
+  module.exports = createTable;

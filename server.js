@@ -1,28 +1,39 @@
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
+
 const express = require("express");
 const axios = require("axios");
 var cors = require('cors');
 const app = express();
-app.use(cors());//{origin: 'https://www......'}
-//const ejs = require("ejs");
+app.use(cors());
 app.set("view engine", "ejs");
 app.use(express.static('public'));// Serve static files from the 'public and vendor' directory
 app.use('/vendor', express.static('vendor'));
 var BaseURL = new URL("https://developer.nps.gov/api/v1");
 const key ="Hq22lDogB9fT2RnHK5smvVPnlaRF6ELQrnctwlhc";
+
 app.get("/",(req,res) =>{
-    res.render("index",{ title: 'My App', header: 'Welcome to National Park Service' });
+
+    res.render("index",{ title: 'National Park Service', header: 'Welcome to National Park Service' });
+
 });
 app.get("/search",(req,res)=>{
     const queryParams = req.query;
-    if(queryParams["q"].length===0){
-        delete queryParams["q"];
+    
+    if(queryParams.q.length===0){
+        delete queryParams.q;
+    }else{
+        const clean = DOMPurify.sanitize(req.query.q);
+        queryParams.q=clean;
     }
     queryParams.api_key=key;
-    console.log(queryParams);
+    //console.log(queryParams);
     axios.get("https://developer.nps.gov/api/v1/parks?limit=20",{
         params:queryParams
     }).then(function(result){
-        console.log(result.data);
+        //console.log(result.data);
         res.send(result.data.data);
     }).catch(function(err){
         console.log(err.data);
@@ -32,7 +43,7 @@ app.get("/search",(req,res)=>{
 app.get("/detail",(req,res)=>{
     const queryParams = req.query;
     queryParams.api_key = key;
-    //get campsite info
+    //get thingstodo info
     axios.get("https://developer.nps.gov/api/v1/thingstodo?limit=3",{
         params:queryParams
     }).then(function(result){
